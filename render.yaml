@@ -22,7 +22,7 @@ services:
     plan: starter
     scaling:
       minInstances: 1
-      maxInstances: 1
+      maxInstances: 3
       targetMemoryPercent: 60
       targetCPUPercent: 60
 
