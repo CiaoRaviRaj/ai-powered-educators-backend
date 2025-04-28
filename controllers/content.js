@@ -15,7 +15,7 @@ export const createContent = async (req, res, next) => {
       return next(createError(404, "Project not found"))
     }
 
-    if (project.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (project.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to add content to this project"))
     }
 
@@ -25,7 +25,7 @@ export const createContent = async (req, res, next) => {
       content,
       contentType,
       project: projectId,
-      user: req.user.id,
+      user: req.me._id,
       prompt,
       metadata: metadata || {},
     })
@@ -50,7 +50,7 @@ export const getContents = async (req, res, next) => {
   try {
     const { projectId } = req.query
 
-    const query = { user: req.user.id }
+    const query = { user: req.me._id }
 
     if (projectId) {
       query.project = projectId
@@ -80,7 +80,7 @@ export const getContent = async (req, res, next) => {
     }
 
     // Check if user owns the content
-    if (content.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (content.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to access this content"))
     }
 
@@ -105,7 +105,7 @@ export const updateContent = async (req, res, next) => {
     }
 
     // Check if user owns the content
-    if (content.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (content.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to update this content"))
     }
 
@@ -140,7 +140,7 @@ export const deleteContent = async (req, res, next) => {
     }
 
     // Check if user owns the content
-    if (content.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (content.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to delete this content"))
     }
 
@@ -172,7 +172,7 @@ export const downloadContent = async (req, res, next) => {
     }
 
     // Check if user owns the content
-    if (content.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (content.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to access this content"))
     }
 

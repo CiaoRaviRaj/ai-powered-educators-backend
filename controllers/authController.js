@@ -3,7 +3,7 @@ import {
   RESPONSE_STATUS_CODE,
 } from "../constants/appConstants.js";
 import User from "../models/User.js";
-import { createError } from "../utils/error.js";
+import { generateAndSendResponse } from "../utils/common.js";
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -14,13 +14,21 @@ export const register = async (req, res, next) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return next(createError(400, "User with this email already exists"));
+      return generateAndSendResponse({
+        res,
+        status: RESPONSE_STATUS_CODE.BAD_REQUEST,
+        message: "User with this email already exists",
+        error: "",
+        errorCode: COMMON_ERROR_CODE.ACU400,
+        data: "",
+      });
     }
 
     const user = await User.create({ name, email, password });
     const token = user.getSignedJwtToken();
 
-    res.status(RESPONSE_STATUS_CODE.CREATED).json({
+    generateAndSendResponse({
+      res,
       status: RESPONSE_STATUS_CODE.CREATED,
       errorCode: COMMON_ERROR_CODE.SUCCESS,
       error: "",
@@ -48,17 +56,38 @@ export const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return next(createError(400, "Please provide an email and password"));
+      return generateAndSendResponse({
+        res,
+        status: RESPONSE_STATUS_CODE.BAD_REQUEST,
+        message: "Please provide a valide email and password!",
+        error: "",
+        errorCode: COMMON_ERROR_CODE.ATC001,
+        data: "",
+      });
     }
 
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
-      return next(createError(401, "Invalid credentials"));
+      return generateAndSendResponse({
+        res,
+        status: RESPONSE_STATUS_CODE.NOT_FOUND,
+        message: "User not found",
+        error: "",
+        errorCode: COMMON_ERROR_CODE.AUTH404,
+        data: "",
+      });
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return next(createError(401, "Invalid credentials"));
+      return generateAndSendResponse({
+        res,
+        status: RESPONSE_STATUS_CODE.BAD_REQUEST,
+        message: "Please provide a valide email and password!",
+        error: "",
+        errorCode: COMMON_ERROR_CODE.ATC001,
+        data: "",
+      });
     }
 
     user.lastLogin = Date.now();
@@ -66,11 +95,12 @@ export const login = async (req, res, next) => {
 
     const token = user.getSignedJwtToken();
 
-    res.status(RESPONSE_STATUS_CODE.OK).json({
+    generateAndSendResponse({
+      res,
       status: RESPONSE_STATUS_CODE.OK,
-      errorCode: COMMON_ERROR_CODE.SUCCESS,
-      error: "",
       message: "Logged in successfully",
+      error: "",
+      errorCode: COMMON_ERROR_CODE.SUCCESS,
       data: {
         token,
         user: {
@@ -91,7 +121,7 @@ export const login = async (req, res, next) => {
 // @access  Private
 export const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.me._id);
 
     res.status(RESPONSE_STATUS_CODE.OK).json({
       status: RESPONSE_STATUS_CODE.OK,
@@ -139,7 +169,7 @@ export const updateProfile = async (req, res, next) => {
     if (name) updateFields.name = name;
     if (email) updateFields.email = email;
 
-    const user = await User.findByIdAndUpdate(req.user.id, updateFields, {
+    const user = await User.findByIdAndUpdate(req.me.id, updateFields, {
       new: true,
       runValidators: true,
     });
