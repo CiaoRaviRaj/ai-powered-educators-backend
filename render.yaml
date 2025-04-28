@@ -26,7 +26,6 @@ services:
       targetMemoryPercent: 60
       targetCPUPercent: 60
 
-  - type: mongo
-    name: wings-ai-mongodb
+databases:
+  - name: wings-ai-mongodb
     plan: starter
-    ipAllowList: [] # Only allow internal connections
