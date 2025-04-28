@@ -33,7 +33,7 @@ export const uploadFile = async (req, res, next) => {
         return next(createError(404, "Project not found"))
       }
 
-      if (project.user.toString() !== req.user.id && req.user.role !== "admin") {
+      if (project.user.toString() !== req.me._id && req.user.role !== "admin") {
         return next(createError(403, "Not authorized to add files to this project"))
       }
     }
@@ -54,7 +54,7 @@ export const uploadFile = async (req, res, next) => {
       path: filePath,
       mimetype: uploadedFile.mimetype,
       size: uploadedFile.size,
-      user: req.user.id,
+      user: req.me._id,
       project: projectId || null,
     })
 
@@ -81,7 +81,7 @@ export const getFiles = async (req, res, next) => {
   try {
     const { projectId } = req.query
 
-    const query = { user: req.user.id }
+    const query = { user: req.me._id }
 
     if (projectId) {
       query.project = projectId
@@ -111,7 +111,7 @@ export const getFile = async (req, res, next) => {
     }
 
     // Check if user owns the file
-    if (file.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (file.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to access this file"))
     }
 
@@ -136,7 +136,7 @@ export const deleteFile = async (req, res, next) => {
     }
 
     // Check if user owns the file
-    if (file.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (file.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to delete this file"))
     }
 
@@ -176,7 +176,7 @@ export const downloadFile = async (req, res, next) => {
     }
 
     // Check if user owns the file
-    if (file.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (file.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to access this file"))
     }
 
@@ -204,7 +204,7 @@ export const processFile = async (req, res, next) => {
     }
 
     // Check if user owns the file
-    if (file.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (file.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to process this file"))
     }
 

@@ -87,7 +87,18 @@ export const createAssignment = async (req, res, next) => {
 // @access  Private
 export const getAllAssignments = async (req, res, next) => {
   try {
-    const assignments = await Assignment.find({ userId: req.me._id })
+    const { search } = req.query;
+    const query = { userId: req.me._id };
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { learningObjectivesDescription: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const assignments = await Assignment.find(query)
       .populate("courseId")
       .populate("assignmentCategoryId");
 
@@ -109,6 +120,8 @@ export const getAllAssignments = async (req, res, next) => {
 // @access  Private
 export const getAssignmentById = async (req, res, next) => {
   try {
+    console.log("req.params.id", req.params.id);
+    console.log("req.me._id", req.me._id);
     const assignment = await Assignment.findOne({
       _id: req.params.id,
       userId: req.me._id,

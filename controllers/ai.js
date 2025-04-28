@@ -23,7 +23,7 @@ export const generateContent = async (req, res, next) => {
         return next(createError(404, "Project not found"))
       }
 
-      if (project.user.toString() !== req.user.id && req.user.role !== "admin") {
+      if (project.user.toString() !== req.me._id && req.user.role !== "admin") {
         return next(createError(403, "Not authorized to generate content for this project"))
       }
     }
@@ -44,7 +44,7 @@ export const generateContent = async (req, res, next) => {
         content: text,
         contentType: contentType || "other",
         project: projectId,
-        user: req.user.id,
+        user: req.me._id,
         prompt,
       })
 
@@ -102,7 +102,7 @@ export const analyzeFile = async (req, res, next) => {
     }
 
     // Check if user owns the file
-    if (file.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (file.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to analyze this file"))
     }
 
@@ -130,7 +130,7 @@ export const analyzeFile = async (req, res, next) => {
         content: text,
         contentType: "other",
         project: projectId,
-        user: req.user.id,
+        user: req.me._id,
         prompt: fullPrompt,
         metadata: {
           fileId: file._id,
@@ -199,7 +199,7 @@ export const generateFeedback = async (req, res, next) => {
         content: text,
         contentType: "feedback",
         project: projectId,
-        user: req.user.id,
+        user: req.me._id,
         prompt,
         metadata: {
           gradeLevel,
@@ -268,7 +268,7 @@ export const generateRubric = async (req, res, next) => {
         content: text,
         contentType: "rubric",
         project: projectId,
-        user: req.user.id,
+        user: req.me._id,
         prompt,
         metadata: {
           gradeLevel,
@@ -346,7 +346,7 @@ export const generateAssignment = async (req, res, next) => {
         content: text,
         contentType: "assignment",
         project: projectId,
-        user: req.user.id,
+        user: req.me._id,
         prompt,
         metadata: {
           gradeLevel,

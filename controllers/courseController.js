@@ -46,10 +46,21 @@ export const createCourse = async (req, res, next) => {
 
 // @desc    Get All Courses
 // @route   GET /api/courses
-// @access  Pri
+// @access  Private
 export const getCourses = async (req, res, next) => {
   try {
-    const courses = await Course.find()
+    const { search } = req.query;
+    const query = {};
+
+    if (search) {
+      query.$or = [
+        { courseTitle: { $regex: search, $options: 'i' } },
+        { courseDescription: { $regex: search, $options: 'i' } },
+        { additionalInformation: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const courses = await Course.find(query)
       .populate("subjectId")
       .populate("gradeId");
 

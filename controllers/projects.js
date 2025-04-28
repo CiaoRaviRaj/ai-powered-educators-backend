@@ -14,7 +14,7 @@ export const createProject = async (req, res, next) => {
       subject,
       gradeLevel,
       contentType,
-      user: req.user.id,
+      user: req.me._id,
       messages: [
         {
           role: "system",
@@ -37,7 +37,7 @@ export const createProject = async (req, res, next) => {
 // @access  Private
 export const getProjects = async (req, res, next) => {
   try {
-    const projects = await Project.find({ user: req.user.id }).sort({ createdAt: -1 })
+    const projects = await Project.find({ user: req.me._id }).sort({ createdAt: -1 })
 
     res.status(200).json({
       success: true,
@@ -61,7 +61,7 @@ export const getProject = async (req, res, next) => {
     }
 
     // Check if user owns the project
-    if (project.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (project.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to access this project"))
     }
 
@@ -86,7 +86,7 @@ export const updateProject = async (req, res, next) => {
     }
 
     // Check if user owns the project
-    if (project.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (project.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to update this project"))
     }
 
@@ -116,7 +116,7 @@ export const deleteProject = async (req, res, next) => {
     }
 
     // Check if user owns the project
-    if (project.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (project.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to delete this project"))
     }
 
@@ -149,7 +149,7 @@ export const addMessageToProject = async (req, res, next) => {
     }
 
     // Check if user owns the project
-    if (project.user.toString() !== req.user.id && req.user.role !== "admin") {
+    if (project.user.toString() !== req.me._id && req.user.role !== "admin") {
       return next(createError(403, "Not authorized to update this project"))
     }
 

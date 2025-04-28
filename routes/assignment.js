@@ -8,6 +8,6 @@ router.post("/create", verifyToken, createAssignment);
 router.get("/", verifyToken, getAllAssignments);
 router.get("/:id", verifyToken, getAssignmentById);
 router.post("/update/:id", verifyToken, updateAssignment);
-router.delete("/:id", verifyToken, deleteAssignment);
+router.post("/delete/:id", verifyToken, deleteAssignment);
 
 export default router;

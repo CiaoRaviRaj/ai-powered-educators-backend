@@ -77,7 +77,6 @@ export const login = async (req, res, next) => {
         data: "",
       });
     }
-    console.log("user", user);
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
@@ -122,7 +121,7 @@ export const login = async (req, res, next) => {
 // @access  Private
 export const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.me._id);
 
     res.status(RESPONSE_STATUS_CODE.OK).json({
       status: RESPONSE_STATUS_CODE.OK,
@@ -170,7 +169,7 @@ export const updateProfile = async (req, res, next) => {
     if (name) updateFields.name = name;
     if (email) updateFields.email = email;
 
-    const user = await User.findByIdAndUpdate(req.user.id, updateFields, {
+    const user = await User.findByIdAndUpdate(req.me.id, updateFields, {
       new: true,
       runValidators: true,
     });
