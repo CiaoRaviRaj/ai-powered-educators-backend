@@ -20,16 +20,20 @@ export const createCourse = async (req, res, next) => {
       systemPrompt,
     } = req.body;
 
-    const course = await Course.create({
+    const createObject = {
       courseTitle,
       subjectId,
       gradeId,
       courseDescription,
       generationPrompt,
       additionalInformation,
-      systemPrompt,
       userId: req.me._id,
-    });
+    }
+    if (!systemPrompt) {
+      createObject.systemPrompt = ModuleWiseSystemPrompt["COURSE"]
+    }
+
+    const course = await Course.create(createObject);
 
     generateAndSendResponse({
       res,
@@ -125,17 +129,21 @@ export const updateCourse = async (req, res, next) => {
       systemPrompt,
     } = req.body;
 
+    const updateObject = {
+      courseTitle,
+      subjectId,
+      gradeId,
+      courseDescription,
+      generationPrompt,
+    }
+
+    if (!systemPrompt) {
+      createObject.systemPrompt = ModuleWiseSystemPrompt["COURSE"]
+    }
+
     const course = await Course.findByIdAndUpdate(
       req.params.id,
-      {
-        courseTitle,
-        subjectId,
-        gradeId,
-        courseDescription,
-        generationPrompt,
-        additionalInformation,
-        systemPrompt,
-      },
+      updateObject,
       { new: true, runValidators: true }
     );
 
